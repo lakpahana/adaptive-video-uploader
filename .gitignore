@@ -24,3 +24,7 @@ go.work.sum
 # env file
 .env
 service-account.json
+cmd/output/*ts
+cmd/output/*m3u8
+*.mp4
+cmd/output/*jpg 
