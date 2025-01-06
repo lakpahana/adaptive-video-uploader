@@ -25,7 +25,7 @@ func NewFirebase(ctx context.Context, credPath string, storageBucket string) (*F
 		storageBucket: storageBucket}, nil
 }
 
-func (f *Firebase) Store(ctx context.Context, key string, data io.Reader) (string, error) {
+func (f *Firebase) Store(ctx context.Context, key string, folderName string, data io.Reader) (string, error) {
 	client, err := f.app.Storage(ctx)
 	if err != nil {
 		return "Err", fmt.Errorf("app.Storage: %v", err)

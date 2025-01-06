@@ -40,7 +40,7 @@ func NewFTP(conf *FTPConf) (*FTP, error) {
 	return &FTP{conn: conn, conf: conf}, nil
 }
 
-func (f *FTP) Store(ctx context.Context, key string, data io.Reader) (string, error) {
+func (f *FTP) Store(ctx context.Context, key string, folderName string, data io.Reader) (string, error) {
 	if err := f.conn.Stor(key, data); err != nil {
 		return "Err", fmt.Errorf("f.conn.Stor: %v", err)
 	}

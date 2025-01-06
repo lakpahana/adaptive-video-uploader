@@ -3,6 +3,7 @@ package supabase
 import (
 	"context"
 	"io"
+	"strings"
 
 	sp_storage "github.com/supabase-community/storage-go"
 )
@@ -24,11 +25,24 @@ func NewSupabase(apiKey, appUrl, storageBucket string) (*Supabase, error) {
 	}, nil
 }
 
-func (s *Supabase) Store(ctx context.Context, key string, data io.Reader) (string, error) {
-	upload, err := s.Client.UploadFile(s.StorageBucket, key, data)
+func (s *Supabase) Store(ctx context.Context, key string, folderName string, data io.Reader) (string, error) {
+
+	contentType := "text/plain;charset=UTF-8"
+
+	if strings.Contains(key, ".png") {
+		contentType = "image/png"
+	}
+
+	if strings.Contains(key, ".jpg") {
+		contentType = "image/jpeg"
+	}
+
+	_, err := s.Client.UploadFile(s.StorageBucket+"/"+folderName, key, data, sp_storage.FileOptions{
+		ContentType: &contentType,
+	})
 	if err != nil {
 		return "", err
 	}
-
-	return upload.Message, nil
+	uploadURL := s.AppUrl + "/object/public/" + s.StorageBucket + "/" + folderName + "/" + key
+	return uploadURL, nil
 }
