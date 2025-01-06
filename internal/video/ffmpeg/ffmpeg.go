@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/lakpahana/adaptive-video-uploader/internal/path"
 )
 
 type FFMPEG struct {
@@ -15,7 +17,7 @@ func (f *FFMPEG) CreateHLS(inputFilePath string, outputDirPath string) error {
 		return err
 	}
 
-	command := fmt.Sprintf(createHLSCommand, inputFilePath, segmentTime, outputDirPath)
+	command := fmt.Sprintf(createHLSCommand, inputFilePath, segmentTime, outputDirPath, path.GetFileName(inputFilePath))
 
 	args := strings.Split(command, " ")
 
@@ -35,7 +37,7 @@ func (f *FFMPEG) CreateThumbnail(inputFilePath string, outputDirPath string) err
 		return err
 	}
 
-	command := fmt.Sprintf(createThumbnailCommand, inputFilePath, outputDirPath)
+	command := fmt.Sprintf(createThumbnailCommand, inputFilePath, outputDirPath, path.GetFileName(inputFilePath))
 
 	args := strings.Split(command, " ")
 
