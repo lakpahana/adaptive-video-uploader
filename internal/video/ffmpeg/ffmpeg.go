@@ -21,10 +21,9 @@ func (f *FFMPEG) CreateHLS(inputFilePath string, outputDirPath string) error {
 
 	commandExec := exec.Command(args[0], args[1:]...)
 
-	output, err := commandExec.CombinedOutput()
+	_, err := commandExec.CombinedOutput()
 
 	if err != nil {
-		fmt.Println(string(output))
 		return fmt.Errorf("ffmpeg command failed: %s", string(err.Error()))
 	}
 
@@ -42,10 +41,9 @@ func (f *FFMPEG) CreateThumbnail(inputFilePath string, outputDirPath string) err
 
 	commandExec := exec.Command(args[0], args[1:]...)
 
-	output, err := commandExec.CombinedOutput()
+	_, err := commandExec.CombinedOutput()
 
 	if err != nil {
-		fmt.Println(string(output))
 		return fmt.Errorf("ffmpeg command failed: %s", string(err.Error()))
 	}
 
