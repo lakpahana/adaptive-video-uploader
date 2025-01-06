@@ -4,17 +4,40 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/lakpahana/adaptive-video-uploader/internal/env"
 	"github.com/lakpahana/adaptive-video-uploader/internal/path"
 	"github.com/lakpahana/adaptive-video-uploader/internal/storage"
-	"github.com/lakpahana/adaptive-video-uploader/internal/storage/firebase"
+	"github.com/lakpahana/adaptive-video-uploader/internal/storage/ftp"
 	"github.com/lakpahana/adaptive-video-uploader/internal/video"
 	"github.com/lakpahana/adaptive-video-uploader/internal/video/ffmpeg"
 )
 
 func main() {
 	env.LoadEnv()
+
+	ftpPort, err := strconv.Atoi(os.Getenv("FTP_PORT"))
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	ftpConf := &ftp.FTPConf{
+		Host:     os.Getenv("FTP_HOST"),
+		Port:     ftpPort,
+		Username: os.Getenv("FTP_USER"),
+		Password: os.Getenv("FTP_PASSWORD"),
+		Path:     os.Getenv("FTP_PATH"),
+	}
+
+	ftp, err := ftp.NewFTP(ftpConf)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	ffmpeg := &ffmpeg.FFMPEG{}
 
@@ -25,7 +48,7 @@ func main() {
 	inputVideoPath := path.GetProjectRootPath() + "/cmd/input.mp4"
 	outputDirPath := path.GetProjectRootPath() + "/cmd/output"
 
-	err := video.Video.CreateHLS(inputVideoPath, outputDirPath)
+	err = video.Video.CreateHLS(inputVideoPath, outputDirPath)
 
 	if err != nil {
 		fmt.Println(err)
@@ -37,18 +60,22 @@ func main() {
 		fmt.Println(err)
 	}
 
-	storageBucket := os.Getenv("STORAGE_BUCKET")
-	serviceAccount := os.Getenv("SERVICE_ACCOUNT")
+	// storageBucket := os.Getenv("STORAGE_BUCKET")
+	// serviceAccount := os.Getenv("SERVICE_ACCOUNT")
 
-	app, err := firebase.NewFirebase(context.Background(),
-		path.GetProjectRootPath()+"/"+serviceAccount, storageBucket)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	// app, err := firebase.NewFirebase(context.Background(),
+	// 	path.GetProjectRootPath()+"/"+serviceAccount, storageBucket)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+
+	// storageHandler := &storage.StorageHandler{
+	// 	Storage: app,
+	// }
 
 	storageHandler := &storage.StorageHandler{
-		Storage: app,
+		Storage: ftp,
 	}
 
 	for _, file := range path.GetFiles(outputDirPath) {
