@@ -25,24 +25,25 @@ func NewFirebase(ctx context.Context, credPath string, storageBucket string) (*F
 		storageBucket: storageBucket}, nil
 }
 
-func (f *Firebase) Store(ctx context.Context, key string, data io.Reader) error {
+func (f *Firebase) Store(ctx context.Context, key string, data io.Reader) (string, error) {
 	client, err := f.app.Storage(ctx)
 	if err != nil {
-		return fmt.Errorf("app.Storage: %v", err)
+		return "Err", fmt.Errorf("app.Storage: %v", err)
 	}
 
 	bucket, err := client.Bucket(f.storageBucket)
 	if err != nil {
-		return fmt.Errorf("client.DefaultBucket: %v", err)
+		return "Err", fmt.Errorf("client.DefaultBucket: %v", err)
 	}
 
 	obj := bucket.Object(key)
 	w := obj.NewWriter(ctx)
 	if _, err := io.Copy(w, data); err != nil {
-		return fmt.Errorf("io.Copy: %v", err)
+		return "Err", fmt.Errorf("io.Copy: %v", err)
 	}
 	if err := w.Close(); err != nil {
-		return fmt.Errorf("w.Close: %v", err)
+		return "Err", fmt.Errorf("w.Close: %v", err)
 	}
-	return nil
+	return w.Attrs().MediaLink, nil
+
 }

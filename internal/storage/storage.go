@@ -6,7 +6,7 @@ import (
 )
 
 type Storage interface {
-	Store(ctx context.Context, key string, data io.Reader) error
+	Store(ctx context.Context, key string, data io.Reader) (string, error)
 }
 
 type StorageHandler struct {
