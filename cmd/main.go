@@ -4,12 +4,11 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/lakpahana/adaptive-video-uploader/internal/env"
 	"github.com/lakpahana/adaptive-video-uploader/internal/path"
 	"github.com/lakpahana/adaptive-video-uploader/internal/storage"
-	"github.com/lakpahana/adaptive-video-uploader/internal/storage/ftp"
+	"github.com/lakpahana/adaptive-video-uploader/internal/storage/supabase"
 	"github.com/lakpahana/adaptive-video-uploader/internal/video"
 	"github.com/lakpahana/adaptive-video-uploader/internal/video/ffmpeg"
 )
@@ -17,22 +16,35 @@ import (
 func main() {
 	env.LoadEnv()
 
-	ftpPort, err := strconv.Atoi(os.Getenv("FTP_PORT"))
+	// ftpPort, err := strconv.Atoi(os.Getenv("FTP_PORT"))
 
-	if err != nil {
-		fmt.Println(err)
-		return
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+
+	// ftpConf := &ftp.FTPConf{
+	// 	Host:     os.Getenv("FTP_HOST"),
+	// 	Port:     ftpPort,
+	// 	Username: os.Getenv("FTP_USER"),
+	// 	Password: os.Getenv("FTP_PASSWORD"),
+	// 	Path:     os.Getenv("FTP_PATH"),
+	// }
+
+	// ftp, err := ftp.NewFTP(ftpConf)
+
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+
+	sp := &supabase.Supabase{
+		ApiKey:        os.Getenv("SUPABASE_KEY"),
+		AppUrl:        os.Getenv("SUPABASE_URL"),
+		StorageBucket: os.Getenv("SUPABASE_BUCKET"),
 	}
 
-	ftpConf := &ftp.FTPConf{
-		Host:     os.Getenv("FTP_HOST"),
-		Port:     ftpPort,
-		Username: os.Getenv("FTP_USER"),
-		Password: os.Getenv("FTP_PASSWORD"),
-		Path:     os.Getenv("FTP_PATH"),
-	}
-
-	ftp, err := ftp.NewFTP(ftpConf)
+	app, err := supabase.NewSupabase(sp.ApiKey, sp.AppUrl, sp.StorageBucket)
 
 	if err != nil {
 		fmt.Println(err)
@@ -75,7 +87,7 @@ func main() {
 	// }
 
 	storageHandler := &storage.StorageHandler{
-		Storage: ftp,
+		Storage: app,
 	}
 
 	for _, file := range path.GetFiles(outputDirPath) {

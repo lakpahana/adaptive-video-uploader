@@ -1,6 +1,6 @@
 package ffmpeg
 
-const segmentTime = 30
+const segmentTime = 5
 
 const createHLSCommand = "ffmpeg -i %s -profile:v baseline -level 3.0 -start_number 0 -hls_time %d -hls_list_size 0 -f hls %s/%s_playlist.m3u8"
 
